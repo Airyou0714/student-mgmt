@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}{% if cls %}编辑班级{% else %}新建班级{% endif %} — 学生管理系统{% endblock %}
+{% block page_title %}{% if cls %}编辑班级{% else %}新建班级{% endif %}{% endblock %}
+{% block page_sub %}班级将用于学生归属与统计筛选{% endblock %}
+{% block content %}
+<div class="glass-card card-pad" style="max-width: 640px">
+  <form method="post">
+    <div class="row g-3">
+      <div class="col-12">
+        <label class="form-label" for="name">班级名称 <span class="text-danger">*</span></label>
+        <input
+          class="form-control"
+          id="name"
+          name="name"
+          required
+          value="{{ cls.name if cls else '' }}"
+          placeholder="例如：计算机 2401 班"
+        />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="grade">年级</label>
+        <input
+          class="form-control"
+          id="grade"
+          name="grade"
+          value="{{ cls.grade if cls else '' }}"
+          placeholder="例如：2024 级"
+        />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="code">班码 / 简称</label>
+        <input class="form-control" id="code" name="code" value="{{ cls.code if cls else '' }}" />
+      </div>
+      <div class="col-12">
+        <label class="form-label" for="head_teacher">班主任</label>
+        <input
+          class="form-control"
+          id="head_teacher"
+          name="head_teacher"
+          value="{{ cls.head_teacher if cls else '' }}"
+        />
+      </div>
+      <div class="col-12">
+        <label class="form-label" for="remark">备注</label>
+        <textarea class="form-control" id="remark" name="remark" rows="2">{{ cls.remark if cls else '' }}</textarea>
+      </div>
+    </div>
+    <div class="mt-4 d-flex flex-wrap gap-2">
+      <button type="submit" class="btn btn-primary">保存</button>
+      <a class="btn btn-outline-secondary" href="{{ url_for('main.classes_list') }}">返回</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

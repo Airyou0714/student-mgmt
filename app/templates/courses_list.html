@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}课程 — 学生管理系统{% endblock %}
+{% block page_title %}课程管理{% endblock %}
+{% block page_sub %}维护课程库、学分与任课教师{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>课程</h1>
+    <p>进入课程可管理选课；成绩与考勤均依赖选课关系。</p>
+  </div>
+  <a class="btn btn-primary" href="{{ url_for('main.courses_new') }}"
+    ><i class="bi bi-plus-lg me-1"></i> 新建课程</a
+  >
+</div>
+
+{% if courses %}
+<div class="row g-3">
+  {% for c in courses %}
+  <div class="col-md-6 col-xl-4">
+    <div class="glass-card card-pad h-100 d-flex flex-column">
+      <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+        <div>
+          <h2 class="h6 mb-1 text-white">{{ c.name }}</h2>
+          <div class="small text-muted">
+            {% if c.code %}代码 {{ c.code }} · {% endif %}学分 {{ c.credits or 0 }} ·
+            {{ c.teacher_name or "未填教师" }}
+          </div>
+        </div>
+        <span class="badge-soft">{{ c.enrollments|length }} 人选课</span>
+      </div>
+      {% if c.remark %}
+      <p class="small text-muted flex-grow-1">{{ c.remark }}</p>
+      {% else %}
+      <p class="small text-muted flex-grow-1 mb-0">—</p>
+      {% endif %}
+      <div class="d-flex flex-wrap gap-2 mt-3">
+        <a class="btn btn-sm btn-primary" href="{{ url_for('main.course_enrollments', course_id=c.id) }}"
+          ><i class="bi bi-person-check me-1"></i> 选课</a
+        >
+        <a class="btn btn-sm btn-outline-light" href="{{ url_for('main.courses_edit', course_id=c.id) }}"
+          >编辑</a
+        >
+        <form
+          class="ms-auto"
+          method="post"
+          action="{{ url_for('main.courses_delete', course_id=c.id) }}"
+          onsubmit="return confirm('删除课程将清空该课所有选课、成绩与考勤，确定？');"
+        >
+          <button type="submit" class="btn btn-sm btn-outline-danger">删除</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="glass-card card-pad text-muted">暂无课程。<a href="{{ url_for('main.courses_new') }}">新建课程</a>。</div>
+{% endif %}
+{% endblock %}

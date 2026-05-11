@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}考勤 — 学生管理系统{% endblock %}
+{% block page_title %}考勤记录{% endblock %}
+{% block page_sub %}按课程与日期区间筛选，支持单条编辑{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>考勤</h1>
+    <p>单日同一学生同一课程仅保留一条记录；重复提交将覆盖。</p>
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    <a class="btn btn-outline-light" href="{{ url_for('main.attendance_bulk') }}"
+      ><i class="bi bi-calendar-week me-1"></i> 批量登记</a
+    >
+    <a class="btn btn-primary" href="{{ url_for('main.attendance_new') }}"
+      ><i class="bi bi-plus-lg me-1"></i> 单条登记</a
+    >
+  </div>
+</div>
+
+<form class="glass-card card-pad mb-3" method="get" action="{{ url_for('main.attendance_list') }}">
+  <div class="row g-2 align-items-end">
+    <div class="col-md-4">
+      <label class="form-label small text-muted mb-1">课程</label>
+      <select class="form-select" name="course_id">
+        <option value="">全部</option>
+        {% for c in courses %}
+        <option value="{{ c.id }}" {% if filter_course_id == c.id %}selected{% endif %}>
+          {{ c.name }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label small text-muted mb-1">开始日期</label>
+      <input class="form-control" type="date" name="from" value="{{ date_from }}" />
+    </div>
+    <div class="col-md-3">
+      <label class="form-label small text-muted mb-1">结束日期</label>
+      <input class="form-control" type="date" name="to" value="{{ date_to }}" />
+    </div>
+    <div class="col-md-2 d-grid gap-2">
+      <button type="submit" class="btn btn-primary">筛选</button>
+      <a class="btn btn-outline-secondary" href="{{ url_for('main.attendance_list') }}">重置</a>
+    </div>
+  </div>
+</form>
+
+{% if rows %}
+<div class="table-wrap">
+  <table class="table table-striped table-hover align-middle mb-0">
+    <thead>
+      <tr>
+        <th>日期</th>
+        <th>学生</th>
+        <th>班级</th>
+        <th>课程</th>
+        <th>状态</th>
+        <th>备注</th>
+        <th class="text-end">操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td><span class="badge-soft">{{ r.attend_date.isoformat() }}</span></td>
+        <td>
+          <div class="fw-semibold">{{ r.student.name }}</div>
+          <div class="small text-muted">{{ r.student.student_no }}</div>
+        </td>
+        <td>
+          {% if r.student.school_class %}{{ r.student.school_class.name }}{% else %}—{% endif %}
+        </td>
+        <td>{{ r.course.name }}</td>
+        <td>{{ r.status }}</td>
+        <td class="small text-muted">{{ r.note or "—" }}</td>
+        <td class="text-end text-nowrap">
+          <a class="btn btn-sm btn-outline-light" href="{{ url_for('main.attendance_edit', aid=r.id) }}"
+            >编辑</a
+          >
+          <form
+            class="d-inline"
+            method="post"
+            action="{{ url_for('main.attendance_delete', aid=r.id) }}"
+            onsubmit="return confirm('确定删除该考勤记录？');"
+          >
+            <button type="submit" class="btn btn-sm btn-outline-danger">删除</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<p class="small text-muted mt-2 mb-0">最多展示 800 条。</p>
+{% else %}
+<div class="glass-card card-pad text-muted">暂无考勤。<a href="{{ url_for('main.attendance_bulk') }}">批量登记</a> 或 <a href="{{ url_for('main.attendance_new') }}">单条登记</a>。</div>
+{% endif %}
+{% endblock %}

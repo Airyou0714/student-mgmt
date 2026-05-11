@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}工作台 — 学生管理系统{% endblock %}
+{% block page_title %}工作台{% endblock %}
+{% block page_sub %}一眼掌握学生规模与今日考勤动态{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>你好，{{ current_user.username }}</h1>
+    <p>从左侧进入各模块，建议先维护班级与课程，再为学生选课。</p>
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    <a class="btn btn-primary" href="{{ url_for('main.student_new') }}"
+      ><i class="bi bi-person-plus me-1"></i> 新增学生</a
+    >
+    <a class="btn btn-outline-light" href="{{ url_for('main.classes_new') }}"
+      ><i class="bi bi-collection me-1"></i> 新建班级</a
+    >
+  </div>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-card glass-card">
+    <div class="label">在校学生</div>
+    <div class="value">{{ total_students }}</div>
+  </div>
+  <div class="stat-card glass-card">
+    <div class="label">班级数量</div>
+    <div class="value">{{ total_classes }}</div>
+  </div>
+  <div class="stat-card glass-card">
+    <div class="label">课程数量</div>
+    <div class="value">{{ total_courses }}</div>
+  </div>
+  <div class="stat-card glass-card">
+    <div class="label">成绩记录</div>
+    <div class="value">{{ total_grades }}</div>
+  </div>
+  <div class="stat-card glass-card">
+    <div class="label">今日考勤条数</div>
+    <div class="value">{{ today_attendance }}</div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="glass-card card-pad h-100">
+      <h2 class="h6 mb-3 text-white">快捷入口</h2>
+      <div class="d-grid gap-2">
+        <a class="btn btn-outline-light text-start" href="{{ url_for('main.student_list') }}"
+          ><i class="bi bi-people me-2"></i>学生名册</a
+        >
+        <a class="btn btn-outline-light text-start" href="{{ url_for('main.courses_list') }}"
+          ><i class="bi bi-journal-bookmark me-2"></i>课程与选课</a
+        >
+        <a class="btn btn-outline-light text-start" href="{{ url_for('main.grades_new') }}"
+          ><i class="bi bi-graph-up-arrow me-2"></i>录入成绩</a
+        >
+        <a class="btn btn-outline-light text-start" href="{{ url_for('main.attendance_bulk') }}"
+          ><i class="bi bi-calendar-week me-2"></i>批量考勤</a
+        >
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="glass-card card-pad h-100">
+      <h2 class="h6 mb-2 text-white">小贴士</h2>
+      <ul class="small text-muted mb-0 ps-3">
+        <li class="mb-2">成绩与单次考勤均要求「已选课」，请先在课程页完成选课。</li>
+        <li class="mb-2">批量考勤可按课程+日期一次性勾选全班状态。</li>
+        <li>删除课程会级联清空该课的选课、成绩与考勤。</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

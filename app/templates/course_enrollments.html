@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}选课 — {{ course.name }} — 学生管理系统{% endblock %}
+{% block page_title %}课程选课{% endblock %}
+{% block page_sub %}{{ course.name }} · 已选 {{ enrollments|length }} 人{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>{{ course.name }}</h1>
+    <p>只有已选课的学生，才允许录入成绩与考勤。</p>
+  </div>
+  <a class="btn btn-outline-secondary" href="{{ url_for('main.courses_list') }}"
+    ><i class="bi bi-arrow-left me-1"></i> 返回课程</a
+  >
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="glass-card card-pad h-100">
+      <h2 class="h6 text-white mb-3">添加学生</h2>
+      {% if available_students %}
+      <form method="post">
+        <label class="form-label">选择学生</label>
+        <select class="form-select mb-3" name="student_id" required>
+          <option value="" disabled selected>请选择…</option>
+          {% for s in available_students %}
+          <option value="{{ s.id }}">
+            {{ s.student_no }} · {{ s.name }}{% if s.school_class %} · {{ s.school_class.name }}{% endif %}
+          </option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary w-100">加入课程</button>
+      </form>
+      {% else %}
+      <p class="text-muted small mb-0">所有学生已在课程中，或尚未录入学生档案。</p>
+      {% endif %}
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="table-wrap">
+      <table class="table table-striped table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>学号</th>
+            <th>姓名</th>
+            <th>班级</th>
+            <th class="text-end">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for e in enrollments %}
+          <tr>
+            <td>{{ e.student.student_no }}</td>
+            <td class="fw-semibold">{{ e.student.name }}</td>
+            <td>
+              {% if e.student.school_class %}{{ e.student.school_class.name }}{% else %}—{% endif %}
+            </td>
+            <td class="text-end">
+              <form
+                method="post"
+                action="{{ url_for('main.enrollment_delete', eid=e.id) }}"
+                onsubmit="return confirm('退选将删除该生在此课下的成绩与考勤，确定？');"
+              >
+                <button type="submit" class="btn btn-sm btn-outline-danger">退选</button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="4" class="text-muted text-center py-4">暂无选课记录</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

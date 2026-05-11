@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}{% if student %}编辑学生{% else %}新增学生{% endif %} — 学生管理系统{% endblock %}
+{% block page_title %}{% if student %}编辑学生{% else %}新增学生{% endif %}{% endblock %}
+{% block page_sub %}完善基础信息并指定所属班级{% endblock %}
+{% block content %}
+<div class="glass-card card-pad" style="max-width: 720px">
+  <form method="post">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label" for="name">姓名 <span class="text-danger">*</span></label>
+        <input
+          class="form-control"
+          id="name"
+          name="name"
+          required
+          value="{{ student.name if student else '' }}"
+        />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="student_no">学号 <span class="text-danger">*</span></label>
+        <input
+          class="form-control"
+          id="student_no"
+          name="student_no"
+          required
+          value="{{ student.student_no if student else '' }}"
+        />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="gender">性别</label>
+        <select class="form-select" id="gender" name="gender">
+          {% set g = student.gender if student else '' %}
+          <option value="" {% if not g %}selected{% endif %}>未填写</option>
+          <option value="男" {% if g == '男' %}selected{% endif %}>男</option>
+          <option value="女" {% if g == '女' %}selected{% endif %}>女</option>
+          <option value="其他" {% if g == '其他' %}selected{% endif %}>其他</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="class_id">班级</label>
+        <select class="form-select" id="class_id" name="class_id">
+          <option value="">未分班</option>
+          {% for c in classes %}
+          <option
+            value="{{ c.id }}"
+            {% if student and student.class_id == c.id %}selected{% endif %}
+          >
+            {{ c.name }}{% if c.grade %}（{{ c.grade }}）{% endif %}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="phone">手机</label>
+        <input
+          class="form-control"
+          id="phone"
+          name="phone"
+          value="{{ student.phone if student else '' }}"
+        />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="email">邮箱</label>
+        <input
+          class="form-control"
+          type="email"
+          id="email"
+          name="email"
+          value="{{ student.email if student else '' }}"
+        />
+      </div>
+      <div class="col-12">
+        <label class="form-label" for="remark">备注</label>
+        <textarea class="form-control" id="remark" name="remark" rows="2">{{ student.remark if student else '' }}</textarea>
+      </div>
+    </div>
+    <div class="mt-4 d-flex flex-wrap gap-2">
+      <button type="submit" class="btn btn-primary">保存</button>
+      <a class="btn btn-outline-secondary" href="{{ url_for('main.student_list') }}">返回列表</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

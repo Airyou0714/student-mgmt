@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}{% if row %}编辑考勤{% else %}登记考勤{% endif %} — 学生管理系统{% endblock %}
+{% block page_title %}{% if row %}编辑考勤{% else %}登记考勤{% endif %}{% endblock %}
+{% block page_sub %}仅支持已选课的学生与课程组合{% endblock %}
+{% block content %}
+<div class="glass-card card-pad" style="max-width: 720px">
+  <form
+    method="post"
+    action="{% if row %}{{ url_for('main.attendance_edit', aid=row.id) }}{% else %}{{ url_for('main.attendance_new') }}{% endif %}"
+  >
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label" for="student_id">学生 <span class="text-danger">*</span></label>
+        <select class="form-select" id="student_id" name="student_id" required>
+          <option value="" disabled {% if not row %}selected{% endif %}>请选择…</option>
+          {% for s in students %}
+          <option value="{{ s.id }}" {% if row and row.student_id == s.id %}selected{% endif %}>
+            {{ s.student_no }} · {{ s.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="course_id">课程 <span class="text-danger">*</span></label>
+        <select class="form-select" id="course_id" name="course_id" required>
+          <option value="" disabled {% if not row %}selected{% endif %}>请选择…</option>
+          {% for c in courses %}
+          <option value="{{ c.id }}" {% if row and row.course_id == c.id %}selected{% endif %}>
+            {{ c.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="attend_date">日期 <span class="text-danger">*</span></label>
+        <input
+          class="form-control"
+          type="date"
+          id="attend_date"
+          name="attend_date"
+          required
+          value="{{ row.attend_date.isoformat() if row else today_iso }}"
+        />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="status">出勤状态</label>
+        {% set st = row.status if row else '出勤' %}
+        <select class="form-select" id="status" name="status">
+          <option value="出勤" {% if st == '出勤' %}selected{% endif %}>出勤</option>
+          <option value="缺勤" {% if st == '缺勤' %}selected{% endif %}>缺勤</option>
+          <option value="迟到" {% if st == '迟到' %}selected{% endif %}>迟到</option>
+          <option value="请假" {% if st == '请假' %}selected{% endif %}>请假</option>
+        </select>
+      </div>
+      <div class="col-12">
+        <label class="form-label" for="note">备注</label>
+        <input class="form-control" id="note" name="note" value="{{ row.note if row else '' }}" />
+      </div>
+    </div>
+    <div class="mt-4 d-flex flex-wrap gap-2">
+      <button type="submit" class="btn btn-primary">保存</button>
+      <a class="btn btn-outline-secondary" href="{{ url_for('main.attendance_list') }}">返回列表</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

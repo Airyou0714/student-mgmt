@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}批量考勤 — 学生管理系统{% endblock %}
+{% block page_title %}批量考勤{% endblock %}
+{% block page_sub %}按课程 + 日期一次性登记全班出勤{% endblock %}
+{% block content %}
+<div class="glass-card card-pad mb-3">
+  <form class="row g-2 align-items-end" method="get" action="{{ url_for('main.attendance_bulk') }}">
+    <div class="col-md-5">
+      <label class="form-label small text-muted mb-1">课程</label>
+      <select class="form-select" name="course_id" required>
+        <option value="">请选择课程…</option>
+        {% for c in courses %}
+        <option value="{{ c.id }}" {% if course and course.id == c.id %}selected{% endif %}>
+          {{ c.name }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label small text-muted mb-1">日期</label>
+      <input class="form-control" type="date" name="attend_date" value="{{ attend_date }}" required />
+    </div>
+    <div class="col-md-3 d-grid">
+      <button type="submit" class="btn btn-outline-light">载入名单</button>
+    </div>
+  </form>
+</div>
+
+{% if course and enrollments %}
+<form method="post">
+  <input type="hidden" name="course_id" value="{{ course.id }}" />
+  <input type="hidden" name="attend_date" value="{{ attend_date }}" />
+
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+    <div class="text-muted small">
+      课程：<span class="text-white fw-semibold">{{ course.name }}</span> · 共
+      {{ enrollments|length }} 人
+    </div>
+    <button type="submit" class="btn btn-primary"><i class="bi bi-check2-circle me-1"></i> 保存本页考勤</button>
+  </div>
+
+  <div class="table-wrap">
+    <table class="table table-striped align-middle mb-0">
+      <thead>
+        <tr>
+          <th>学号</th>
+          <th>姓名</th>
+          <th>班级</th>
+          <th style="min-width: 140px">状态</th>
+          <th>备注</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in enrollments %}
+        {% set att = (status_map or {}).get(e.student_id) %}
+        {% set cur = att.status if att else '出勤' %}
+        <tr>
+          <td>{{ e.student.student_no }}</td>
+          <td class="fw-semibold">{{ e.student.name }}</td>
+          <td>
+            {% if e.student.school_class %}{{ e.student.school_class.name }}{% else %}—{% endif %}
+          </td>
+          <td>
+            <select class="form-select form-select-sm" name="status_{{ e.student_id }}">
+              <option value="出勤" {% if cur == '出勤' %}selected{% endif %}>出勤</option>
+              <option value="缺勤" {% if cur == '缺勤' %}selected{% endif %}>缺勤</option>
+              <option value="迟到" {% if cur == '迟到' %}selected{% endif %}>迟到</option>
+              <option value="请假" {% if cur == '请假' %}selected{% endif %}>请假</option>
+            </select>
+          </td>
+          <td>
+            <input
+              class="form-control form-control-sm"
+              name="note_{{ e.student_id }}"
+              value="{{ att.note if att else '' }}"
+              placeholder="可选"
+            />
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</form>
+{% elif course and not enrollments %}
+<div class="glass-card card-pad text-muted">该课程暂无选课学生，请先在「课程 → 选课」中添加。</div>
+{% else %}
+<div class="glass-card card-pad text-muted">请选择课程与日期后点击「载入名单」。</div>
+{% endif %}
+{% endblock %}
